@@ -62,6 +62,8 @@ model User {
   sessions      Session[]
   accounts      Account[]
 
+  properties    Property[]
+
   @@map("user")
 }
 
@@ -74,4 +76,39 @@ model Verification {
   updatedAt  DateTime?
 
   @@map("verification")
+}
+
+model Property {
+  id          String      @id @default(cuid())
+  title       String
+  slug        String    @unique
+  location    String
+  price       String
+  beds        Int
+  baths       Float
+  sqft        Int
+  type        PropertyType
+  tag         String
+  image       String
+  content     String
+  amenities   String[]
+  status      Status    @default(ACTIVE)
+
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+enum PropertyType {
+  FOR_SALE
+  FOR_RENT
+}
+
+enum Status {
+  ACTIVE
+  INACTIVE
+  SOLD
+  RENTED
 }

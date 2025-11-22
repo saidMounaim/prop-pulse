@@ -15,3 +15,13 @@ export function getUserInitials(name: string = "") {
     return trimmedName.substring(0, 2);
   }
 }
+
+export function slugify(text: string) {
+  return text
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/[^\w\-]+/g, "")
+    .replace(/\-\-+/g, "-");
+}
