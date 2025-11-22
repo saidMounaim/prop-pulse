@@ -3,6 +3,8 @@
 import { unstable_cache } from "next/cache";
 import prisma from "../prisma";
 import { PropertyType, Status } from "../generated/prisma/enums";
+import { auth } from "../auth";
+import { headers } from "next/headers";
 
 export interface PropertyFilterParams {
   query?: string;
@@ -109,4 +111,74 @@ export async function getProperties(params: PropertyFilterParams) {
     console.error("Database Error:", error);
     return [];
   }
+}
+
+export async function getAgentProperties() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    throw new Error("Unauthorized");
+  }
+
+  const currentUserId = session?.user?.id;
+
+  try {
+    const properties = await prisma.property.findMany({
+      where: {
+        userId: currentUserId,
+      },
+      orderBy: {
+        updatedAt: "desc",
+      },
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        location: true,
+        price: true,
+        status: true,
+        type: true,
+        image: true,
+        createdAt: true,
+      },
+    });
+
+    return properties;
+  } catch (error) {
+    console.error("Failed to fetch agent properties:", error);
+    throw new Error("Failed to load properties");
+  }
+}
+
+export async function getDashboardStats(userId: string) {
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+  const [totalListings, activeListings, newInLast30Days] = await Promise.all([
+    prisma.property.count({
+      where: { userId },
+    }),
+
+    prisma.property.count({
+      where: {
+        userId,
+        status: Status.ACTIVE,
+      },
+    }),
+
+    prisma.property.count({
+      where: {
+        userId,
+        createdAt: { gte: thirtyDaysAgo },
+      },
+    }),
+  ]);
+
+  return {
+    totalListings,
+    activeListings,
+    newInLast30Days,
+  };
 }

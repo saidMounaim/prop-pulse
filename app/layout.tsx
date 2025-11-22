@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/shared/includes/header";
-import Footer from "@/components/shared/includes/footer";
 
 import { Toaster } from "sonner";
 
@@ -25,14 +23,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${montserrat.variable} antialiased`}>
-        <div className="flex min-h-screen flex-col">
-          <main className="flex-1">
-            <Header />
-            {children}
-            <Footer />
-            <Toaster richColors />
-          </main>
-        </div>
+        {children}
+        <Toaster richColors />
       </body>
     </html>
   );
