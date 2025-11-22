@@ -4,6 +4,8 @@ import "./globals.css";
 import Header from "@/components/shared/includes/header";
 import Footer from "@/components/shared/includes/footer";
 
+import { Toaster } from "sonner";
+
 const montserrat = Montserrat({
   variable: "--font-montserrat",
   subsets: ["latin"],
@@ -28,6 +30,7 @@ export default function RootLayout({
             <Header />
             {children}
             <Footer />
+            <Toaster richColors />
           </main>
         </div>
       </body>
