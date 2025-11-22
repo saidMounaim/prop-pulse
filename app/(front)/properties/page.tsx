@@ -14,8 +14,6 @@ export default async function PropertiesPage({
   const properties = await getProperties({
     query: resolvedParams.query as string,
     type: resolvedParams.type as string,
-    minPrice: resolvedParams.minPrice as string,
-    maxPrice: resolvedParams.maxPrice as string,
     beds: resolvedParams.beds as string,
     baths: resolvedParams.baths as string,
     amenities: resolvedParams.amenities,

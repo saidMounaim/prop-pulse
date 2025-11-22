@@ -234,7 +234,6 @@ export default async function PropertyDetailsPage({
                     </div>
 
                     <div className="grid gap-2">
-                      {/* Pre-filled message helps conversion */}
                       <Textarea
                         name="message"
                         defaultValue={`Hi ${

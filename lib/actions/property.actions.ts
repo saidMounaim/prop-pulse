@@ -1,10 +1,13 @@
 "use server";
 
-import { unstable_cache } from "next/cache";
+import { revalidatePath, unstable_cache } from "next/cache";
 import prisma from "../prisma";
 import { PropertyType, Status } from "../generated/prisma/enums";
 import { auth } from "../auth";
 import { headers } from "next/headers";
+import { slugify } from "../utils";
+import { z } from "zod";
+import { propertySchema } from "../validations";
 
 export interface PropertyFilterParams {
   query?: string;
@@ -181,4 +184,43 @@ export async function getDashboardStats(userId: string) {
     activeListings,
     newInLast30Days,
   };
+}
+
+type CreatePropertyArgs = z.infer<typeof propertySchema> & { imageUrl: string };
+
+export async function createProperty(data: CreatePropertyArgs) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    throw new Error("Unauthorized");
+  }
+
+  try {
+    await prisma.property.create({
+      data: {
+        title: data.title,
+        slug: slugify(data.title),
+        location: data.location,
+        price: data.price,
+        beds: data.beds,
+        baths: data.baths,
+        sqft: data.sqft,
+        type: data.type,
+        tag: data.tag || "",
+        image: data.imageUrl,
+        content: data.content,
+        amenities: data.amenities,
+        status: data.status,
+        userId: session.user.id,
+      },
+    });
+  } catch (error) {
+    console.error("Database Error:", error);
+    throw new Error("Failed to create property listing");
+  }
+
+  revalidatePath("/dashboard");
+  revalidatePath("/properties");
 }
