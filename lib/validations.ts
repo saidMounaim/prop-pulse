@@ -34,15 +34,9 @@ export const propertySchema = z.object({
     message: "Select at least one amenity",
   }),
   tag: z.string().optional(),
-  image: z
-    .any()
-    .refine((files) => files?.length >= 1, "Image is required")
-    .refine(
-      (files) => files?.[0]?.size <= MAX_FILE_SIZE,
-      `Max image size is 5MB.`
-    )
-    .refine(
-      (files) => ACCEPTED_IMAGE_TYPES.includes(files?.[0]?.type),
-      "Only .jpg, .jpeg, .png and .webp formats are supported."
-    ),
+  image: z.any().refine((val) => {
+    if (typeof val === "string" && val.length > 0) return true;
+    if (val instanceof FileList) return val.length > 0;
+    return false;
+  }, "Image is required"),
 });

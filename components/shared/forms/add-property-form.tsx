@@ -31,8 +31,9 @@ import {
 } from "@/components/ui/form";
 import { toast } from "sonner";
 import { uploadToImageKit } from "@/lib/actions/upload.actions";
-import { createProperty } from "@/lib/actions/property.actions";
+import { createProperty, updateProperty } from "@/lib/actions/property.actions";
 import { propertySchema } from "@/lib/validations";
+import { Property } from "@/lib/generated/prisma/client";
 
 const AMENITIES_LIST = [
   "Air Conditioning",
@@ -51,45 +52,66 @@ const AMENITIES_LIST = [
 
 type PropertyFormValues = z.infer<typeof propertySchema>;
 
-export default function AddPropertyForm() {
+interface PropertyFormProps {
+  initialData?: Property | null;
+}
+
+export default function AddPropertyForm({ initialData }: PropertyFormProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+
+  const defaultValues = initialData
+    ? {
+        ...initialData,
+        image: initialData.image,
+        tag: initialData.tag || "",
+      }
+    : {
+        type: "FOR_SALE",
+        status: "ACTIVE",
+        amenities: [],
+        beds: 0,
+        baths: 0,
+        sqft: 0,
+        title: "",
+        price: "",
+        location: "",
+        content: "",
+        tag: "",
+        image: undefined,
+      };
 
   const form = useForm<PropertyFormValues>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(propertySchema) as any,
-    defaultValues: {
-      type: "FOR_SALE",
-      status: "ACTIVE",
-      amenities: [],
-      beds: 0,
-      baths: 0,
-      sqft: 0,
-      title: "",
-      price: "",
-      location: "",
-      content: "",
-    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    defaultValues: defaultValues as any,
   });
 
   const onSubmit = async (values: PropertyFormValues) => {
     setIsLoading(true);
     try {
-      const formData = new FormData();
-      formData.append("file", values.image[0]);
+      let imageUrl = values.image;
 
-      const imageUrl = await uploadToImageKit(formData);
+      if (typeof values.image === "object" && values.image.length > 0) {
+        const formData = new FormData();
+        formData.append("file", values.image[0]);
+        imageUrl = await uploadToImageKit(formData);
+      }
 
-      await createProperty({
-        ...values,
-        imageUrl: imageUrl,
-      });
+      if (initialData) {
+        await updateProperty(initialData.id, { ...values, imageUrl });
+        toast.success("Property updated successfully");
+      } else {
+        await createProperty({ ...values, imageUrl });
+        toast.success("Property created successfully");
+      }
 
-      toast.success("Property listed successfully");
       router.push("/dashboard");
+      router.refresh();
     } catch (error) {
       console.error(error);
-      toast.error("Something went wrong. Please try again.");
+      toast.error("Something went wrong");
     } finally {
       setIsLoading(false);
     }
@@ -345,12 +367,9 @@ export default function AddPropertyForm() {
           </Button>
           <Button type="submit" className="min-w-[150px]" disabled={isLoading}>
             {isLoading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Creating...
-              </>
-            ) : (
-              "Create Property"
-            )}
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : null}
+            {initialData ? "Save Changes" : "Create Property"}
           </Button>
         </div>
       </form>

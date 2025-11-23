@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath, unstable_cache } from "next/cache";
+import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
 import prisma from "../prisma";
 import { PropertyType, Status } from "../generated/prisma/enums";
 import { auth } from "../auth";
@@ -43,8 +43,8 @@ export const getFeaturedProperties = unstable_cache(
       },
     });
   },
-  ["featured-properties"],
-  { revalidate: 3600 }
+  ["featured-properties-key"],
+  { revalidate: 3600, tags: ["featured-properties"] }
 );
 
 export async function getPropertyDetails(slug: string) {
@@ -223,6 +223,7 @@ export async function createProperty(data: CreatePropertyArgs) {
 
   revalidatePath("/dashboard");
   revalidatePath("/properties");
+  revalidateTag("featured-properties", { expire: 0 });
 }
 
 export async function deleteProperty(propertyId: string, userId: string) {
@@ -252,4 +253,44 @@ export async function deleteProperty(propertyId: string, userId: string) {
 
   revalidatePath("/dashboard");
   revalidatePath("/properties");
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function updateProperty(id: string, data: any) {
+  try {
+    const property = await prisma.property.findUnique({
+      where: { id },
+    });
+
+    if (!property) {
+      throw new Error("Property not found");
+    }
+
+    await prisma.property.update({
+      where: { id: property.id },
+      data: {
+        title: data.title,
+        slug:
+          property.title !== data.title ? slugify(data.title) : property.slug,
+        location: data.location,
+        price: data.price,
+        beds: data.beds,
+        baths: data.baths,
+        sqft: data.sqft,
+        type: data.type,
+        tag: data.tag || "",
+        image: data.imageUrl,
+        content: data.content,
+        amenities: data.amenities,
+        status: data.status,
+      },
+    });
+
+    revalidatePath("/dashboard");
+    revalidatePath(`/listings/${property.slug}`);
+    revalidateTag("featured-properties", { expire: 0 });
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to update property listing");
+  }
 }
