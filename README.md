@@ -1,36 +1,84 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PropPulse
 
-## Getting Started
+**PropPulse** is a modern and minimal real estate web application\*\* built with Next.js 16, Prisma,BetterAuth, and ShadCN/UI.  
+Users can browse properties, add listings, and manage their real estate posts through a clean and fast interface.
 
-First, run the development server:
+---
+
+## 🚀 Live Demo
+
+🔗 _(https://proppulse-next.netlify.app/)_
+
+---
+
+## ✨ Features
+
+- 🔐 Authentication with BetterAuth
+- 🏡 Browse all properties with search & filters
+- 📝 Add new property listings with images, price, location, and details
+- 📸 Upload property images using ImageKit
+- 🗂️ Manage your own listings (edit/delete)
+- 💅 Beautiful UI using ShadCN/UI + Tailwind CSS
+- 📱 Fully responsive on all screen sizes
+
+---
+
+## 📦 Tech Stack
+
+- **Next.js 16**
+- **Tailwind CSS**
+- **ShadCN/UI**
+- **TypeScript**
+- **Prisma ORM**
+- **BetterAuth**
+- **ImageKit** (image uploads)
+
+---
+
+## 🛠 Getting Started
+
+Follow these steps to run the project locally:
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/saidMounaim/prop-pulse.git
+cd prop-pulse
+```
+
+### 2. Install dependencies
+
+```bash
+npm install
+```
+
+### 3. Configure environment variables
+
+Create a `.env` file in the root:
+
+```env
+# Database
+DATABASE_URL="postgresql://..."
+
+# BetterAuth
+BETTER_AUTH_BASE_URL="https://proppulse-next.netlify.app"
+BETTER_AUTH_SECRET="your_betterauth_secret"
+
+# ImageKit
+IMAGEKIT_PUBLIC_KEY="your_public_key"
+IMAGEKIT_PRIVATE_KEY="your_private_key"
+IMAGEKIT_URL_ENDPOINT="https://ik.imagekit.io/your_id"
+```
+
+### 4. Start the dev server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 💼 Contribution
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+All contributions are welcome!  
+Fork the repo, create a new branch, and submit a pull request.

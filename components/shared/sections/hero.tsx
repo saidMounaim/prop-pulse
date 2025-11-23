@@ -1,11 +1,26 @@
+"use client";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { MapPin, Search } from "lucide-react";
 import Image from "next/image";
+import { useState } from "react";
+import { toast } from "sonner";
 
 const Hero = () => {
+  const [query, setQuery] = useState("");
+
+  const handleSearch = () => {
+    if (query.trim() !== "") {
+      const searchUrl = `/properties?query=${encodeURIComponent(query)}`;
+      window.location.href = searchUrl;
+    } else {
+      toast.error("Please enter a search query.");
+    }
+  };
+
   return (
     <section className="relative flex min-h-[600px] flex-col items-center justify-center text-center text-white">
       <div className="absolute inset-0 -z-10 overflow-hidden">
@@ -42,12 +57,14 @@ const Hero = () => {
               type="text"
               placeholder="City, Neighborhood, or Address"
               className="border-0 bg-transparent py-6 pl-10 text-black focus-visible:ring-0 focus-visible:ring-offset-0"
+              onChange={(e) => setQuery(e.target.value)}
             />
           </div>
           <Separator orientation="vertical" className="hidden h-8 sm:block" />
           <Button
             size="lg"
             className="w-full text-base font-semibold sm:w-auto"
+            onClick={() => handleSearch()}
           >
             <Search className="mr-2 h-5 w-5" /> Search
           </Button>
